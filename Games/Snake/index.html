@@ -8,11 +8,29 @@
     </head>
 
     <body>
+        <style>
+            #highscore-board {
+                font-family: Arial, sans-serif;
+                font-size: 20px;
+                color: white;
+                background-color: black;
+                padding: 5px 10px;
+                display: inline-block;
+                position: absolute;
+                left: 10px;
+                top: 10px;
+            }
+        </style>
+
+        <!-- highscore section -->
+        <div id="highscore-board">Highscore: 0</div>
+
         <!-- canvas - where the magic will be seen -->
         <canvas id="canvas" width="720" height="480"></canvas>;
 
         <!-- script - for the javascript coding fun -->
         <script>
+            // variables for game
             let canvas = document.getElementById('canvas');
             let ctx = canvas.getContext('2d');
             let rows = 20;
@@ -28,6 +46,9 @@
             let cellHeight = canvas.height / rows;
             let direction = 'LEFT';
             let foodCollected = false;
+
+            // variables for highscore
+            let highscore = 0;
 
             placeFood();
 
@@ -76,10 +97,10 @@
                             y: 3
                         }
                     ];
-
                     placeFood();
-
                     direction = 'LEFT';
+                    highscore = 0;
+                    updateScoreboard();
                 }
             }
 
@@ -108,6 +129,10 @@
                 }
             }
 
+            function updateScoreboard() {
+                document.getElementById('highscore-board').textContent = `Highscore: ${highscore}`;
+            }
+
             function gameLoop() {
                 // test game over scenarios
                 gameOver();
@@ -116,6 +141,7 @@
                     // position of snake, new array plus existing array = ...snake
                     snake = [{ x: snake[0].x, y: snake[0].y }, ...snake];
 
+                    updateScoreboard();
                     foodCollected = false;
                 }
 
@@ -141,8 +167,13 @@
                 // collect food, enlarge snake
                 if (snake[0].x == food.x && snake[0].y == food.y) {
                     foodCollected = true;
+                    highscore++;
+
+                    updateScoreboard();
                     placeFood();
                 }
+
+                draw();
             }
 
             function keyDown(e) {
