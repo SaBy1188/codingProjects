@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Internationaler Zeichensatz -->
+        <meta charset="UTF-8" />
+        <!-- Deutscher Zeichensatz -->
+        <!-- meta charset="ISO-8859-1" /-->
+        <meta name="viewport" content="width=1020, initial-scale=1.0" />
+        <title>Laufen lernen mit JS</title>
+    </head>
+    <body>
+        <p>Ein erster Versuch.</p>
+        <script>
+            alert('Hey, Digga!');
+            alert('Pass mal auf.');
+
+            // step 1: alert(Math.sqrt((2 * 15) / 9.81));
+            // step 2: alert(Math.sqrt((2 * prompt('Höhe aus der du dein Handy fallen lässt:', 'Fallhöhe')) / 9.81))
+            // step 3:
+            const gMars = 3.69;
+            const gMoon = 1.62;
+            const gEarth = 9.81;
+            const gJupiter = 24.79;
+            const distanceFall = prompt('Höhe aus der du dein Handy fallen lässt:', 'Fallhöhe');
+            const calculateFall = Math.sqrt((2 * distanceFall) / gEarth);
+
+            alert(calculateFall);
+        </script>
+    </body>
+</html>
