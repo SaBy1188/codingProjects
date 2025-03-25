@@ -4,88 +4,15 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="style.css" />
         <title>Ping Pong</title>
     </head>
     <body>
+        <h2 id="modeDisplay">Mode: Single Player</h2>
+        <button onclick="setMode(true)">Single Player</button>
+        <button onclick="setMode(false)">Multiplayer</button>
+
         <canvas id="gameboard" width="720px" height="480px" style="background-color: darkslategrey"></canvas>
-        <script>
-            let ctx = gameboard.getContext('2d');
-            let player1 = 80;
-            let player2 = 200;
-            let key = {};
-            let ball = { x: 360, y: 240, speedX: 3, speedY: 0 };
-
-            // key
-            document.addEventListener('keydown', (e) => (key[e.keyCode] = true));
-            document.addEventListener('keyup', (e) => (key[e.keyCode] = false));
-
-            // execute
-            draw();
-            setInterval(loop, 1000 / 60);
-
-            function draw() {
-                ctx.fillStyle = 'black';
-                ctx.fillRect(0, 0, 720, 480); // hide
-
-                ctx.fillStyle = 'white';
-                ctx.fillRect(10, player1, 10, 80); // left player
-                ctx.fillRect(700, player2, 10, 80); // right player
-                ctx.fillRect(ball.x, ball.y, 10, 10); // ball
-                requestAnimationFrame(draw);
-            }
-
-            function loop() {
-                // move player 1
-                if (key[87]) {
-                    player1 = player1 - 5;
-                }
-
-                if (key[83]) {
-                    player1 = player1 + 5;
-                }
-
-                // move player 2
-                if (key[38]) {
-                    player2 = player2 - 5;
-                }
-
-                if (key[40]) {
-                    player2 = player2 + 5;
-                }
-
-                // move ball
-                ball.x = ball.x + ball.speedX;
-                ball.y = ball.y + ball.speedY;
-
-                // rules
-                // players position
-                if (ball.x < 20 || ball.x > 690) {
-                    // players top && players bottom
-                    if (ball.y > player1 && ball.y < player1 + 80 && ball.speedX < 0) {
-                        ball.speedX = -ball.speedX;
-                        ball.speedY = (ball.y - player1 - 40) * 0.1;
-                    }
-
-                    if (ball.y > player2 && ball.y < player2 + 80 && ball.speedX > 0) {
-                        ball.speedX = -ball.speedX;
-                        ball.speedY = (ball.y - player2 - 40) * 0.1;
-                    }
-                }
-
-                if (ball.y < 0 || ball.y > 480) {
-                    ball.speedY = -ball.speedY;
-                }
-
-                // reset ball
-                if (ball.x < 0 || ball.x > 720) {
-                    ball = {
-                        x: 360,
-                        y: 240,
-                        speedX: 3,
-                        speedY: 0
-                    };
-                }
-            }
-        </script>
+        <script src="app.js"></script>
     </body>
 </html>
