@@ -1,6 +1,6 @@
 /**
- * Interactive Web Quiz Application
- * This application generates multiple choice questions using OpenAI's API and serves them to a web interface.
+ * INTERACTIVE WEB QUIZ APPLICATION
+ * note: this application generates multiple choice questions using openAI's API.
  */
 
 require('dotenv').config();
@@ -13,7 +13,7 @@ const openai = new OpenAIApi(configuration);
 
 /**
  * note: generate a new multiple choice question using openAI's API.
- * return: {question: 'text', options: ['a','b','c','d'], answer: 'correct'}
+ * @returns {question: 'text', options: ['a','b','c','d'], answer: 'correct'} a new question object
  */
 async function generateQuestion() {
     const response = await openai.createCompletion({
@@ -43,59 +43,75 @@ let currentQuestionIndex = 0;
 let score = 0;
 
 function getNextQuestion() {
-    currentQuestionIndex++;
     if (currentQuestionIndex < questions.length) {
-        return questions[currentQuestionIndex];
-    } else {
-        console.log(`Quiz complete! Final score: ${score}`);
-        process.exit(0);
+        return questions[currentQuestionIndex++];
     }
+
+    return null;
 }
 
 /**
- * Get the current question and its options
+ * note: get the current question and its options
  * @param {} userAnswer
+ * @param {} correctAnswer
  * @returns {object} current question and options
  */
-function checkAnswer(userAnswer) {
-    const currentQuestion = questions[0];
-    return currentQuestion.answer === userAnswer;
+function checkAnswer(userAnswer, correctAnswer) {
+    return userAnswer.toLwerCase() === correctAnswer.toLowerCase();
 }
 
+/**
+ * note: update the score based on whether the user answered correctly or not
+ * @param {boolean} isCorrect
+ */
 function updateScore(isCorrect) {
     if (isCorrect) {
         score++;
     }
 }
 
+/**
+ * note: display the current question and its options
+ * @param {object} question
+ */
 function displayQuestion(question) {
-    console.log(`Question: ${question.question}`);
+    console.log(question.question);
     question.options.forEach((option, index) => {
         console.log(`${index + 1}. ${option}`);
     });
 }
 
+/**
+ * note: handle user input and update the score
+ * @param {string} input
+ * @returns {boolean} true if the answer is correct, false otherwise
+ */
 function handleUserInput(input) {
-    const userAnswer = parseInt(input) - 1;
-    const isCorrect = checkAnswer(question.options[userAnswer]);
+    const currentQuestion = questions[currentQuestionIndex - 1];
+    const isCorrect = checkAnswer(input, currentQuestion.answer);
     updateScore(isCorrect);
-    console.log(`Your answer: ${question.options[userAnswer]}`);
-    console.log(`Correct answer: ${question.answer}`);
-    console.log(`Score: ${score}`);
-    questions.shift();
+    console.log(isCorrect ? 'Correct!' : 'Wrong!');
+    return isCorrect;
 }
 
-startQuiz = async () => {
-    const question = await getQuestions();
-    displayQuestion(question[0]);
-    // Simulate user input
-    const userInput = prompt('Enter your answer (1-4): ');
-    handleUserInput(userInput);
-};
+/**
+ * note: start the quiz and handle user input
+ * @param {string} userInput
+ * @returns {boolean} true if the answer is correct, false otherwise
+ */
+async function startQuiz() {
+    await refreshQuestions();
+    currentQuestionIndex = 0;
+    const question = getNextQuestion();
+    if (question) {
+        displayQuestion(question);
+    } else {
+        console.log('No more questions available.');
+    }
+}
 
 function endQuiz() {
-    console.log('Quiz ended. Final score: ' + score);
-    process.exit(0);
+    console.log(`Quiz ended. Final score: ${score}/${questions.length}`);
 }
 
 refreshQuestions().catch(console.error);
