@@ -11,57 +11,112 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
+function setupCategoryButtons() {
+    const categoryButtons = document.querySelectorAll('.category-button');
+    categoryButtons.forEach((button) => {
+        button.addEventListener('click', function () {
+            categoryButtons.forEach((btn) => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            const selectedCategory = this.dataset.value;
+            console.log('Selected category:', selectedCategory);
+
+            startQuiz(selectedCategory);
+        });
+    });
+}
+
 /**
- * note: generate a new multiple choice question using openAI's API.
- * @returns {question: 'text', options: ['a','b','c','d'], answer: 'correct'} a new question object
+ * Generate a new multiple choice question using OpenAI's API.
+ * @param {string} category
+ * @returns {Promise<Object>}
  */
-async function generateQuestion() {
+async function generateQuestion(category) {
     const response = await openai.createCompletion({
         model: 'text-davinci-003',
-        prompt: "Generate a multiple choice question with 4 options and the correct answer in JSON format like: {question: 'text', options: ['a','b','c','d'], answer: 'correct'}",
+        prompt: `Generate a multiple choice question about ${category} with 4 options and the correct answer in JSON format like: {question: 'text', options: ['a','b','c','d'], answer: 'correct'}`,
         max_tokens: 150
     });
 
     return JSON.parse(response.data.choices[0].text);
 }
 
+/**
+ * Display the current question and its options
+ * @param {object} question
+ */
+async function displayQuestion(question) {
+    const questionElement = document.getElementById('question-container');
+    const answerContainer = document.getElementById('answer-container');
+
+    questionElement.textContent = question.question;
+    answerContainer.innerHTML = '';
+
+    question.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.textContent = option;
+        button.classList.add('answer-option');
+        button.addEventListener('click', () => handleUserInput(option, question.answer));
+        answerContainer.appendChild(button);
+    });
+}
+
 let questions = [];
-
-async function refreshQuestions() {
-    const newQuestion = await generateQuestion();
-    questions = [newQuestion];
-}
-
-async function getQuestions() {
-    if (questions.length === 0) {
-        await refreshQuestions();
-    }
-    return questions;
-}
-
 let currentQuestionIndex = 0;
 let score = 0;
 
+/**
+ * Starts the quiz by generating a question for the selected category.
+ * @param {string} category
+ */
+async function startQuiz(category) {
+    await refreshQuestions(category);
+    currentQuestionIndex = 0;
+    score = 0;
+    displayNextQuestion();
+}
+
+/**
+ * Refresh questions based on the selected category.
+ * @param {string} category
+ */
+async function refreshQuestions(category) {
+    const newQuestion = await generateQuestion(category);
+    questions = [newQuestion];
+}
+
+/**
+ * Get the next question in the quiz.
+ * @returns {Object|null}
+ */
 function getNextQuestion() {
     if (currentQuestionIndex < questions.length) {
         return questions[currentQuestionIndex++];
     }
-
     return null;
 }
 
-/**
- * note: get the current question and its options
- * @param {} userAnswer
- * @param {} correctAnswer
- * @returns {object} current question and options
- */
-function checkAnswer(userAnswer, correctAnswer) {
-    return userAnswer.toLwerCase() === correctAnswer.toLowerCase();
+async function displayNextQuestion() {
+    const question = getNextQuestion();
+    if (question) {
+        await displayQuestion(question);
+    } else {
+        endQuiz();
+    }
 }
 
 /**
- * note: update the score based on whether the user answered correctly or not
+ * Check the answer provided by the user.
+ * @param {string} userAnswer
+ * @param {string} correctAnswer
+ * @returns {boolean}
+ */
+function checkAnswer(userAnswer, correctAnswer) {
+    return userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+}
+
+/**
+ * Update the score and display the result.
  * @param {boolean} isCorrect
  */
 function updateScore(isCorrect) {
@@ -71,47 +126,28 @@ function updateScore(isCorrect) {
 }
 
 /**
- * note: display the current question and its options
- * @param {object} question
+ * Handle user input for the answer and show whether it's correct.
+ * @param {string} userAnswer
+ * @param {string} correctAnswer
  */
-function displayQuestion(question) {
-    console.log(question.question);
-    question.options.forEach((option, index) => {
-        console.log(`${index + 1}. ${option}`);
-    });
-}
-
-/**
- * note: handle user input and update the score
- * @param {string} input
- * @returns {boolean} true if the answer is correct, false otherwise
- */
-function handleUserInput(input) {
-    const currentQuestion = questions[currentQuestionIndex - 1];
-    const isCorrect = checkAnswer(input, currentQuestion.answer);
+function handleUserInput(userAnswer, correctAnswer) {
+    const isCorrect = checkAnswer(userAnswer, correctAnswer);
     updateScore(isCorrect);
-    console.log(isCorrect ? 'Correct!' : 'Wrong!');
-    return isCorrect;
-}
 
-/**
- * note: start the quiz and handle user input
- * @param {string} userInput
- * @returns {boolean} true if the answer is correct, false otherwise
- */
-async function startQuiz() {
-    await refreshQuestions();
-    currentQuestionIndex = 0;
-    const question = getNextQuestion();
-    if (question) {
-        displayQuestion(question);
-    } else {
-        console.log('No more questions available.');
-    }
+    const resultElement = document.getElementById('feedback');
+    resultElement.textContent = isCorrect ? 'Correct!' : 'Wrong!';
+
+    setTimeout(() => {
+        resultElement.textContent = '';
+        displayNextQuestion();
+    }, 1000);
 }
 
 function endQuiz() {
-    console.log(`Quiz ended. Final score: ${score}/${questions.length}`);
+    const quizElement = document.getElementById('quiz-container');
+    quizElement.innerHTML = `<h2>Quiz ended. Final score: ${score}/${questions.length}</h2>`;
 }
 
-refreshQuestions().catch(console.error);
+window.addEventListener('load', () => {
+    setupCategoryButtons();
+});

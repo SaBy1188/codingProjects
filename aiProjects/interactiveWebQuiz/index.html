@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=780px" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Interactive Web Quiz</title>
         <link rel="stylesheet" href="style.css" />
     </head>
@@ -16,17 +16,21 @@
 
             <!-- Category Selection -->
             <div id="category-container">
-                <option id="category-button" value="generalKnowledge">General Knowledge</option>
-                <option id="category-button" value="science">Science</option>
-                <option id="category-button" value="history">History</option>
-                <option id="category-button" value="geography">Geography</option>
-                <option id="category-button" value="culture">Culture</option>
+                <button class="category-button" data-value="generalKnowledge">General Knowledge</button>
+                <button class="category-button" data-value="science">Science</button>
+                <button class="category-button" data-value="history">History</button>
+                <button class="category-button" data-value="geography">Geography</button>
+                <button class="category-button" data-value="culture">Culture</button>
             </div>
 
             <div id="question-container"></div>
-            <button id="submit-button" class="btn">submit question</button>
-            <button id="generate-question-button" class="btn">generate question</button>
             <div id="answer-container"></div>
+
+            <!-- Feedback -->
+            <div id="feedback"></div>
+
+            <!-- Buttons -->
+            <button id="generate-question-button" class="btn">Generate Question</button>
         </div>
 
         <!-- Score Container -->
