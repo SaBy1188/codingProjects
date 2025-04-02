@@ -1,0 +1,9 @@
+code .gitignore
+# Ignoriere alle .log-Dateien
+*.log
+
+# Ignoriere einen bestimmten Ordner
+node_modules/
+
+# Ignoriere Umgebungsdateien
+.env

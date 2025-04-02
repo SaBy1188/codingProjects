@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=780px" />
+        <title>Interactive Web Quiz</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="quiz-container">
+            <h1>Interactive Web Quiz</h1>
+            <p>
+                Welcome to the interactive Quiz. You can choose one of the following categories to start generating
+                questions. Let's see how many points you'll get.
+            </p>
+
+            <!-- Category Selection -->
+            <div id="category-container">
+                <option id="category-button" value="generalKnowledge">General Knowledge</option>
+                <option id="category-button" value="science">Science</option>
+                <option id="category-button" value="history">History</option>
+                <option id="category-button" value="geography">Geography</option>
+                <option id="category-button" value="culture">Culture</option>
+            </div>
+
+            <div id="question-container"></div>
+            <button id="submit-button" class="btn">submit question</button>
+            <button id="generate-question-button" class="btn">generate question</button>
+            <div id="answer-container"></div>
+        </div>
+
+        <!-- Score Container -->
+        <div id="score-container">
+            <h2>Score</h2>
+            <p id="score">0</p>
+        </div>
+
+        <script src="app.js"></script>
+    </body>
+</html>
